@@ -61,6 +61,25 @@ export default function Home() {
     }
   }
 
+  const checkUpdate = async (address: string) => {
+    try {
+      const res = await fetch('/api/wallets', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, forceUpdate: true }),
+      });
+      if (res.ok) {
+        alert('Check triggered! Bot will send a report momentarily.');
+      } else {
+        alert('Failed to trigger check.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error triggering check.');
+    }
+  }
+
+
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8 font-sans">
       <div className="max-w-4xl mx-auto">
@@ -86,12 +105,20 @@ export default function Home() {
                       {w.address}
                     </a>
                   </div>
-                  <button
-                    onClick={() => deleteWallet(w.address)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => checkUpdate(w.address)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition"
+                    >
+                      Check Now
+                    </button>
+                    <button
+                      onClick={() => deleteWallet(w.address)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -97,4 +97,42 @@ export async function sendAlert(change: PositionChange, address: string, equity:
     } catch (e) {
         console.error("Failed to send telegram message:", e);
     }
+
+    if (state.assetPositions.length === 0) {
+        message += `💤 No open positions.\n`;
+    } else {
+        for (const p of state.assetPositions) {
+            const pos = p.position;
+            const sizeVal = parseFloat(pos.positionValue);
+            if (sizeVal <= 1) continue; // Ignore dust
+
+            const side = parseFloat(pos.szi) > 0 ? 'LONG' : 'SHORT';
+            const isWin = parseFloat(pos.unrealizedPnl) >= 0;
+            const pnlEmoji = isWin ? '🤑' : '😭';
+
+            // Distance to Liq
+            let distToLiq = 0;
+            let distStr = 'N/A';
+            if (pos.liquidationPx) {
+                const markPx = parseFloat(pos.positionValue) / Math.abs(parseFloat(pos.szi));
+                distToLiq = Math.abs(markPx - parseFloat(pos.liquidationPx)) / markPx;
+                distStr = formatPercentage(distToLiq);
+            }
+
+            message += `🔹 **${pos.coin} ${side}**\n`;
+            message += `   💎 Size: ${formatCurrency(pos.positionValue)} (${pos.leverage.value}x)\n`;
+            message += `   💰 uPnL: ${pnlEmoji} ${formatCurrency(pos.unrealizedPnl)}\n`;
+            message += `   📊 Entry: ${parseFloat(pos.entryPx).toFixed(4)}\n`;
+            message += `   🎯 Dist. to Liq: ${distStr}\n\n`;
+        }
+    }
+
+    message += `🔗 [View on Hypurrscan](https://hypurrscan.io/address/${address})`;
+
+    try {
+        await bot.telegram.sendMessage(CONFIG.TELEGRAM_CHANNEL_ID, message, { parse_mode: 'Markdown' });
+    } catch (e) {
+        console.error("Failed to send telegram message:", e);
+    }
 }
+

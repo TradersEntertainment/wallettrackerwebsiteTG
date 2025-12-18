@@ -4,6 +4,7 @@ const WalletSchema = new mongoose.Schema({
     address: { type: String, required: true, unique: true },
     name: { type: String },
     group: { type: String },
+    forceUpdate: { type: Boolean, default: false },
 }, { timestamps: true });
 
 // Prevent overwrite model error in hot reload

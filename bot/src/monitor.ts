@@ -12,7 +12,12 @@ export class Monitor {
     private async loadWallets(): Promise<{ address: string; name?: string }[]> {
         try {
             const wallets = await WalletModel.find({});
-            return wallets.map(w => ({ address: w.address, name: w.name || undefined }));
+            return wallets.map(w => ({
+                address: w.address,
+                name: w.name || undefined,
+                forceUpdate: w.forceUpdate,
+                _id: w._id
+            }));
         } catch (e) {
             console.error("Error loading wallets from DB:", e);
             return [];
@@ -24,8 +29,20 @@ export class Monitor {
         const results: { address: string; changes: PositionChange[], state: ClearinghouseState }[] = [];
 
         for (const wallet of wallets) {
+
             try {
                 const currentState = await getClearinghouseState(wallet.address);
+
+                // Manual Check Logic
+                if ((wallet as any).forceUpdate) {
+                    console.log(`Force update triggered for ${wallet.address}`);
+                    const telegram = require('./telegram'); // Lazy load to avoid circular dep if any
+                    await telegram.sendStatusReport(currentState, wallet.address, wallet.name);
+
+                    // Reset flag
+                    await WalletModel.updateOne({ _id: (wallet as any)._id }, { forceUpdate: false });
+                }
+
                 const lastState = this.lastStates.get(wallet.address);
 
                 if (lastState) {

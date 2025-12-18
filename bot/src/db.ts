@@ -5,6 +5,7 @@ const WalletSchema = new mongoose.Schema({
     address: { type: String, required: true, unique: true },
     name: { type: String },
     group: { type: String },
+    forceUpdate: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export const WalletModel = mongoose.model('Wallet', WalletSchema);

@@ -49,3 +49,20 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: 'Failed to delete wallet' }, { status: 500 });
     }
 }
+
+export async function PATCH(req: Request) {
+    try {
+        await connectDB();
+        const body = await req.json();
+        const { address, forceUpdate } = body;
+
+        if (!address) return NextResponse.json({ error: 'Address required' }, { status: 400 });
+
+        await WalletModel.findOneAndUpdate({ address }, { forceUpdate });
+
+        return NextResponse.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        return NextResponse.json({ error: 'Failed to update wallet' }, { status: 500 });
+    }
+}
