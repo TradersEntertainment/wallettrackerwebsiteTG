@@ -28,7 +28,7 @@ function shortenAddress(address: string): string {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 }
 
-export async function sendAlert(change: PositionChange, address: string, equity: string) {
+export async function sendAlert(change: PositionChange, address: string, equity: string, name?: string) {
     if (!CONFIG.TELEGRAM_CHANNEL_ID) return;
 
     let message = '';
@@ -74,7 +74,7 @@ export async function sendAlert(change: PositionChange, address: string, equity:
     }
 
     message += `━━━━━━━━━━━━━━━━\n`;
-    message += `👑 Whale: \`${shortenAddress(address)}\`\n`;
+    message += `👑 Whale: ${name ? `**${name}**` : ''} \`${shortenAddress(address)}\`\n`;
     if (change.newPosition) {
         message += `💎 Size: ${formatCurrency(change.newPosition.positionValue)}\n`;
         message += `⚡ Leverage: ${change.newPosition.leverage.value}x\n`;
@@ -97,6 +97,15 @@ export async function sendAlert(change: PositionChange, address: string, equity:
     } catch (e) {
         console.error("Failed to send telegram message:", e);
     }
+}
+
+export async function sendStatusReport(state: any, address: string, name?: string) {
+    if (!CONFIG.TELEGRAM_CHANNEL_ID) return;
+
+    let message = `📋 **MANUAL STATUS REPORT** 📋\n`;
+    message += `👑 Whale: ${name ? `**${name}**` : ''} \`${shortenAddress(address)}\`\n`;
+    message += `🏦 Equity: ${formatCurrency(state.crossMarginSummary.accountValue)}\n`;
+    message += `━━━━━━━━━━━━━━━━\n`;
 
     if (state.assetPositions.length === 0) {
         message += `💤 No open positions.\n`;

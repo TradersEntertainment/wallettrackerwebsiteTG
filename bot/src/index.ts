@@ -19,7 +19,7 @@ async function main() {
         for (const update of updates) {
             console.log(`Found updates for ${update.address}: ${update.changes.length} changes`);
             for (const change of update.changes) {
-                await sendAlert(change, update.address, update.state.marginSummary.accountValue);
+                await sendAlert(change, update.address, update.state.marginSummary.accountValue, update.name);
             }
         }
     }, CONFIG.CHECK_INTERVAL_MS);

@@ -24,9 +24,9 @@ export class Monitor {
         }
     }
 
-    public async checkUpdates(): Promise<{ address: string; changes: PositionChange[], state: ClearinghouseState }[]> {
+    public async checkUpdates(): Promise<{ address: string; name?: string; changes: PositionChange[], state: ClearinghouseState }[]> {
         const wallets = await this.loadWallets();
-        const results: { address: string; changes: PositionChange[], state: ClearinghouseState }[] = [];
+        const results: { address: string; name?: string; changes: PositionChange[], state: ClearinghouseState }[] = [];
 
         for (const wallet of wallets) {
 
@@ -48,7 +48,7 @@ export class Monitor {
                 if (lastState) {
                     const changes = this.detectChanges(lastState, currentState);
                     if (changes.length > 0) {
-                        results.push({ address: wallet.address, changes, state: currentState });
+                        results.push({ address: wallet.address, name: wallet.name, changes, state: currentState });
                     }
                 }
 
