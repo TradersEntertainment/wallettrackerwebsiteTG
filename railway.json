@@ -1,0 +1,54 @@
+{
+    "$schema": "https://railway.app/railway.schema.json",
+    "build": {
+        "builder": "NIXPACKS"
+    },
+    "deploy": {
+        "startCommand": "echo 'This is a monorepo root. Please deploy specific services.'"
+    },
+    "services": {
+        "mongo": {
+            "image": "mongo:latest",
+            "restartPolicyType": "ON_FAILURE",
+            "volumes": [
+                {
+                    "mountPath": "/data/db"
+                }
+            ],
+            "env": {
+                "MONGO_INITDB_ROOT_USERNAME": "${MONGO_USER}",
+                "MONGO_INITDB_ROOT_PASSWORD": "${MONGO_PASSWORD}"
+            }
+        },
+        "bot": {
+            "path": "./bot",
+            "build": {
+                "builder": "NIXPACKS",
+                "buildCommand": "npm install && npm run build"
+            },
+            "deploy": {
+                "startCommand": "npm start",
+                "restartPolicyType": "ON_FAILURE",
+                "env": {
+                    "TELEGRAM_BOT_TOKEN": "${TELEGRAM_BOT_TOKEN}",
+                    "TELEGRAM_CHANNEL_ID": "${TELEGRAM_CHANNEL_ID}",
+                    "MONGODB_URI": "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${{mongo.HOST}}:${{mongo.PORT}}"
+                }
+            }
+        },
+        "web": {
+            "path": "./web",
+            "build": {
+                "builder": "NIXPACKS",
+                "buildCommand": "npm install && npm run build"
+            },
+            "deploy": {
+                "startCommand": "npm start",
+                "restartPolicyType": "ON_FAILURE",
+                "env": {
+                    "MONGODB_URI": "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${{mongo.HOST}}:${{mongo.PORT}}"
+                }
+            }
+        }
+    }
+}
