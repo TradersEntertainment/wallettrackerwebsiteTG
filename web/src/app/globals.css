@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Arka plan: çok koyu lacivert / charcoal */
+  --background: #0B1220; 
+  /* Text Ana: #E5E7EB */
+  --foreground: #E5E7EB; 
+  
+  /* Primary: Hyperliquid mavi tonu */
+  --primary: #3B82F6;
+  
+  /* Success: Soft yeşil (PnL için) */
+  --success: #22C55E;
+  
+  /* Danger: Kırmızı ama patlamayan */
+  --danger: #EF4444;
+  
+  /* Text Secondary: #9CA3AF */
+  --text-secondary: #9CA3AF;
+  
+  /* Card/Panel Backgrounds for slight contrast */
+  --card-bg: #0E1625;
+  --card-border: #1F2937;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-text-secondary: var(--text-secondary);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Custom Utilities for that "Pro" feel */
+.glass-panel {
+  background: rgba(14, 22, 37, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Scrollbar styling for that trading terminal look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B1220;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
 }

@@ -1,0 +1,38 @@
+
+> web@0.1.0 build
+> next build
+
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\omery\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\omery\.gemini\antigravity\scratch\hyperliquid-bot\package-lock.json
+
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 1547.3ms
+   Running TypeScript ...
+Failed to compile.
+
+./src/app/page.tsx:108:7
+Type error: Type 'ViewState' is not assignable to type 'NavItem'.
+  Type '"add-wallet"' is not assignable to type 'NavItem'.
+
+  106 |   return (
+  107 |     <MainLayout
+> 108 |       currentView={currentView}
+      |       ^
+  109 |       onNavigate={setCurrentView}
+  110 |       onSettingsClick={() => setCurrentView('alerts')}
+  111 |     >
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\omery\.gemini\antigravity\scratch\hyperliquid-bot\web
+npm error workspace web@0.1.0
+npm error location C:\Users\omery\.gemini\antigravity\scratch\hyperliquid-bot\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build
