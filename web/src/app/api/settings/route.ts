@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { connectDB, SettingsModel } from '@/lib/db';
+import { sendSystemAlert } from '@/lib/telegram';
 
 export async function GET() {
     try {
@@ -32,6 +33,15 @@ export async function POST(req: Request) {
         } else {
             settings = await SettingsModel.create(body);
         }
+
+        // Send Notification
+        const msg = `🛠️ **System Settings Updated**\n\n` +
+            `🔹 Min Value: $${settings.minPositionValueUsd}\n` +
+            `🔹 Min Change: ${settings.minPositionChangePercent * 100}%\n` +
+            `🔹 Notify Close: ${settings.notifyOnClose ? '✅' : '❌'}\n` +
+            `🔹 Notify Liq: ${settings.notifyOnLiq ? '✅' : '❌'}`;
+
+        await sendSystemAlert(msg);
 
         return NextResponse.json(settings);
     } catch (e) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB, WalletModel } from '@/lib/db';
+import { sendSystemAlert } from '@/lib/telegram';
 
 export async function GET() {
     try {
@@ -26,6 +27,10 @@ export async function POST(req: Request) {
         }
 
         const newWallet = await WalletModel.create({ address, name: name || 'Unnamed' });
+
+        // Notify
+        await sendSystemAlert(`🔭 **New Wallet Added**\n\n📌 Address: \`${address}\`\n🏷️ Name: ${name || 'Unnamed'}`);
+
         const wallets = await WalletModel.find({}).sort({ createdAt: -1 }); // Return full list
         return NextResponse.json(wallets);
     } catch (e) {
@@ -41,7 +46,12 @@ export async function DELETE(req: Request) {
         const address = searchParams.get('address');
         if (!address) return NextResponse.json({ error: 'Address required' }, { status: 400 });
 
-        await WalletModel.findOneAndDelete({ address });
+        const existing = await WalletModel.findOneAndDelete({ address });
+
+        if (existing) {
+            await sendSystemAlert(`🗑️ **Wallet Removed**\n\n📌 Address: \`${address}\`\n🏷️ Name: ${existing.name || 'Unnamed'}`);
+        }
+
         const wallets = await WalletModel.find({}).sort({ createdAt: -1 });
         return NextResponse.json(wallets);
     } catch (e) {
