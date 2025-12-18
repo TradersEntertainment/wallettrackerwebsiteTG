@@ -44,7 +44,8 @@ export default function Home() {
         setNewName('');
         fetchWallets();
       } else {
-        alert('Failed to add wallet');
+        const errorData = await res.json();
+        alert(errorData.error || 'Failed to add wallet');
       }
     } catch (e) {
       console.error(e);
