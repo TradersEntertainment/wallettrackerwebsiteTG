@@ -6,6 +6,9 @@ import WalletList from '../components/dashboard/WalletList';
 import AddWalletWizard from '../components/wallet/AddWalletWizard';
 import AlertConfig from '../components/settings/AlertConfig';
 import TelegramPreview from '../components/telegram/TelegramPreview';
+import PositionDetailModal from '../components/dashboard/PositionDetailModal';
+import RiskRulesPage from '../components/dashboard/RiskRulesPage';
+import LogsPage from '../components/dashboard/LogsPage';
 
 interface Wallet {
   address: string;
@@ -18,6 +21,9 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // State for Position Detail Modal
+  const [detailedWallet, setDetailedWallet] = useState<string | null>(null);
 
   useEffect(() => {
     fetchWallets();
@@ -71,7 +77,7 @@ export default function Home() {
               <WalletList
                 wallets={wallets}
                 loading={loading}
-                onView={(addr) => alert('Position detailed view coming in next update')}
+                onView={(addr) => setDetailedWallet(addr)}
                 onCheck={(addr) => fetch('/api/wallets', { method: 'PATCH', body: JSON.stringify({ address: addr, forceUpdate: true }) })}
                 onDelete={handleDeleteWallet}
                 onAddClick={() => setCurrentView('add-wallet')}
@@ -81,6 +87,14 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-6">Live Activity</h3>
               <TelegramPreview />
             </div>
+
+            {/* Modal */}
+            {detailedWallet && (
+              <PositionDetailModal
+                address={detailedWallet}
+                onClose={() => setDetailedWallet(null)}
+              />
+            )}
           </div>
         );
       case 'add-wallet':
@@ -92,6 +106,10 @@ export default function Home() {
         );
       case 'alerts':
         return <AlertConfig />;
+      case 'risk':
+        return <RiskRulesPage />;
+      case 'logs':
+        return <LogsPage />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-[50vh] text-text-secondary">
