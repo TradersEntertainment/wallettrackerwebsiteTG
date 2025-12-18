@@ -10,6 +10,15 @@ const WalletSchema = new mongoose.Schema({
 
 export const WalletModel = mongoose.model('Wallet', WalletSchema);
 
+const SettingsSchema = new mongoose.Schema({
+    minPositionValueUsd: { type: Number, default: 10 },
+    minPositionChangePercent: { type: Number, default: 0.01 }, // 1%
+    notifyOnClose: { type: Boolean, default: true },
+    notifyOnLiq: { type: Boolean, default: true },
+}, { timestamps: true });
+
+export const SettingsModel = mongoose.model('Settings', SettingsSchema);
+
 export async function connectDB() {
     if (mongoose.connection.readyState >= 1) return;
 

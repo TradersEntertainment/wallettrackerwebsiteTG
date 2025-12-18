@@ -1,6 +1,6 @@
 import { ClearinghouseState, Position, PositionChange, AssetCtx } from './types';
 import { getClearinghouseState } from './hyperliquid';
-import { WalletModel, connectDB } from './db';
+import { WalletModel, SettingsModel, connectDB } from './db';
 
 export class Monitor {
     private lastStates: Map<string, ClearinghouseState> = new Map();
@@ -28,6 +28,12 @@ export class Monitor {
         const wallets = await this.loadWallets();
         const results: { address: string; name?: string; changes: PositionChange[], state: ClearinghouseState }[] = [];
 
+        // Fetch settings
+        const settings = await SettingsModel.findOne({});
+        const minVal = settings?.minPositionValueUsd ?? 10;
+        const minPct = settings?.minPositionChangePercent ?? 0.01;
+        const notifyClose = settings?.notifyOnClose ?? true;
+
         for (const wallet of wallets) {
 
             try {
@@ -46,7 +52,7 @@ export class Monitor {
                 const lastState = this.lastStates.get(wallet.address);
 
                 if (lastState) {
-                    const changes = this.detectChanges(lastState, currentState);
+                    const changes = this.detectChanges(lastState, currentState, minVal, minPct, notifyClose);
                     if (changes.length > 0) {
                         results.push({ address: wallet.address, name: wallet.name, changes, state: currentState });
                     }
@@ -62,7 +68,7 @@ export class Monitor {
         return results;
     }
 
-    private detectChanges(oldState: ClearinghouseState, newState: ClearinghouseState): PositionChange[] {
+    private detectChanges(oldState: ClearinghouseState, newState: ClearinghouseState, minVal: number, minPct: number, notifyClose: boolean): PositionChange[] {
         const changes: PositionChange[] = [];
         const newPositionsMap = new Map<string, Position>();
 
@@ -75,16 +81,27 @@ export class Monitor {
 
             if (!newP) {
                 // Position Closed
-                changes.push({
-                    type: 'CLOSE',
-                    coin: coin,
-                    oldPosition: oldP.position,
-                    pnl: parseFloat(oldP.position.unrealizedPnl) // Approximation
-                });
+                if (notifyClose) {
+                    changes.push({
+                        type: 'CLOSE',
+                        coin: coin,
+                        oldPosition: oldP.position,
+                        pnl: parseFloat(oldP.position.unrealizedPnl)
+                    });
+                }
             } else {
                 // Position Modified?
                 const oldSz = parseFloat(oldP.position.szi);
                 const newSz = parseFloat(newP.szi);
+                const rawVal = parseFloat(newP.positionValue);
+
+                if (rawVal < minVal) return; // Skip small positions
+
+                // Calculate % change relative to old size
+                const sizeDiff = Math.abs(newSz) - Math.abs(oldSz);
+                const pctChange = Math.abs(sizeDiff) / Math.abs(oldSz);
+
+                if (pctChange < minPct) return; // Skip small changes
 
                 if (Math.abs(newSz) > Math.abs(oldSz)) {
                     changes.push({
@@ -111,11 +128,14 @@ export class Monitor {
             const coin = newP.position.coin;
             const oldP = oldState.assetPositions.find(p => p.position.coin === coin);
             if (!oldP) {
-                changes.push({
-                    type: 'NEW',
-                    coin: coin,
-                    newPosition: newP.position
-                });
+                const rawVal = parseFloat(newP.position.positionValue);
+                if (rawVal >= minVal) {
+                    changes.push({
+                        type: 'NEW',
+                        coin: coin,
+                        newPosition: newP.position
+                    });
+                }
             }
         });
 

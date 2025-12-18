@@ -13,8 +13,18 @@ export default function Home() {
   const [newName, setNewName] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Settings State
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState({
+    minPositionValueUsd: 10,
+    minPositionChangePercent: 0.01,
+    notifyOnClose: true,
+    notifyOnLiq: true
+  });
+
   useEffect(() => {
     fetchWallets();
+    fetchSettings();
   }, []);
 
   const fetchWallets = async () => {
@@ -26,6 +36,43 @@ export default function Home() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (data && !data.error) {
+        setSettings({
+          minPositionValueUsd: data.minPositionValueUsd ?? 10,
+          minPositionChangePercent: data.minPositionChangePercent ?? 0.01,
+          notifyOnClose: data.notifyOnClose ?? true,
+          notifyOnLiq: data.notifyOnLiq ?? true
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const saveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (res.ok) {
+        alert('Settings saved!');
+        setShowSettings(false);
+      } else {
+        alert('Failed to save settings');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error saving settings');
     }
   };
 
@@ -84,7 +131,66 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8 font-sans">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-blue-400">Hyperliquid Watcher 🐳</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-blue-400">Hyperliquid Watcher 🐳</h1>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition"
+          >
+            ⚙️ Settings
+          </button>
+        </div>
+
+        {showSettings && (
+          <div className="bg-gray-800 rounded-lg p-6 shadow-lg mb-8 border border-gray-600">
+            <h2 className="text-2xl font-semibold mb-4">Global Settings</h2>
+            <form onSubmit={saveSettings} className="space-y-4">
+              <div>
+                <label className="block text-sm mb-1 text-gray-300">Min Position Value ($)</label>
+                <input
+                  type="number"
+                  value={settings.minPositionValueUsd}
+                  onChange={e => setSettings({ ...settings, minPositionValueUsd: parseFloat(e.target.value) })}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ignore positions smaller than this value.</p>
+              </div>
+              <div>
+                <label className="block text-sm mb-1 text-gray-300">Min Position Change (%)</label>
+                <input
+                  type="number"
+                  step="0.001"
+                  value={settings.minPositionChangePercent}
+                  onChange={e => setSettings({ ...settings, minPositionChangePercent: parseFloat(e.target.value) })}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">Example: 0.05 = 5%. Ignore small size changes.</p>
+              </div>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyOnClose}
+                    onChange={e => setSettings({ ...settings, notifyOnClose: e.target.checked })}
+                  />
+                  Notify on Close
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyOnLiq}
+                    onChange={e => setSettings({ ...settings, notifyOnLiq: e.target.checked })}
+                  />
+                  Notify on Liquidation
+                </label>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button type="button" onClick={() => setShowSettings(false)} className="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
+                <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">Save Settings</button>
+              </div>
+            </form>
+          </div>
+        )}
 
         <div className="bg-gray-800 rounded-lg p-6 shadow-lg mb-8">
           <h2 className="text-2xl font-semibold mb-4">Monitored Wallets</h2>
