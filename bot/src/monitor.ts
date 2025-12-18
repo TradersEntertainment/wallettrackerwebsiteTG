@@ -1,28 +1,26 @@
 import { ClearinghouseState, Position, PositionChange, AssetCtx } from './types';
 import { getClearinghouseState } from './hyperliquid';
-import * as fs from 'fs';
-import * as path from 'path';
+import { WalletModel, connectDB } from './db';
 
 export class Monitor {
     private lastStates: Map<string, ClearinghouseState> = new Map();
-    private walletsPath: string;
 
-    constructor(walletsPath: string) {
-        this.walletsPath = walletsPath;
+    constructor() {
+        connectDB();
     }
 
-    private loadWallets(): { address: string; name?: string }[] {
+    private async loadWallets(): Promise<{ address: string; name?: string }[]> {
         try {
-            const data = fs.readFileSync(this.walletsPath, 'utf-8');
-            return JSON.parse(data);
+            const wallets = await WalletModel.find({});
+            return wallets.map(w => ({ address: w.address, name: w.name || undefined }));
         } catch (e) {
-            console.error("Error loading wallets:", e);
+            console.error("Error loading wallets from DB:", e);
             return [];
         }
     }
 
     public async checkUpdates(): Promise<{ address: string; changes: PositionChange[], state: ClearinghouseState }[]> {
-        const wallets = this.loadWallets();
+        const wallets = await this.loadWallets();
         const results: { address: string; changes: PositionChange[], state: ClearinghouseState }[] = [];
 
         for (const wallet of wallets) {

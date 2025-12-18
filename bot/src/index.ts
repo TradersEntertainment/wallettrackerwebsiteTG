@@ -7,13 +7,10 @@ async function main() {
     console.log('Starting Hyperliquid Bot...');
     startBot();
 
-    // Fix path resolution for wallets.json
-    // If running from bot/src, we need to go up to shared/wallets.json
-    // Config default is '../shared/wallets.json'
-    const walletsPath = path.resolve(__dirname, '..', CONFIG.WALLETS_FILE_PATH);
-    console.log(`Using wallets file at: ${walletsPath}`);
+    // Fix path resolution for wallets.json - DEPRECATED
+    // Using MongoDB
 
-    const monitor = new Monitor(walletsPath);
+    const monitor = new Monitor();
 
     setInterval(async () => {
         console.log('Checking for updates...');
