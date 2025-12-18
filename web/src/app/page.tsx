@@ -185,19 +185,18 @@ export default function Home() {
                 <label className="block text-sm mb-1 text-gray-300">Min Position Change (%)</label>
                 <input
                   type="number"
-                  step="0.001"
-                  value={settings.minPositionChangePercent}
-                  onChange={e => setSettings({ ...settings, minPositionChangePercent: parseFloat(e.target.value) })}
+                  step="0.1"
+                  value={settings.minPositionChangePercent * 100}
+                  onChange={e => setSettings({ ...settings, minPositionChangePercent: parseFloat(e.target.value) / 100 })}
                   className="w-full p-2 bg-gray-700 rounded border border-gray-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">Example: 0.05 = 5%. Ignore small size changes.</p>
+                <p className="text-xs text-gray-500 mt-1">Example: 5 = 5%. Ignore changes smaller than this.</p>
               </div>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={settings.notifyOnClose}
-                    onChange={e => setSettings({ ...settings, notifyOnClose: e.target.checked })}
                   />
                   Notify on Close
                 </label>
