@@ -1,0 +1,16 @@
+{
+    "name": "hyperliquid-bot-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "bot",
+        "web"
+    ],
+    "scripts": {
+        "build": "echo 'Building workspaces...'",
+        "start": "echo 'Please start specific workspace'"
+    },
+    "engines": {
+        "node": ">=18"
+    }
+}
