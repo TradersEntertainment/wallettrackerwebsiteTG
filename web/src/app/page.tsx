@@ -41,7 +41,7 @@ export default function Home() {
     }
   };
 
-  const handleAddWallet = async (data: { address: string; name: string }) => {
+  const handleAddWallet = async (data: { address: string; name: string; password?: string }) => {
     try {
       const res = await fetch('/api/wallets', {
         method: 'POST',
@@ -51,6 +51,8 @@ export default function Home() {
       if (res.ok) {
         await fetchWallets();
         setCurrentView('dashboard');
+      } else if (res.status === 401) {
+        alert('Incorrect password! Ask admin for access.');
       } else {
         alert('Failed to add wallet');
       }

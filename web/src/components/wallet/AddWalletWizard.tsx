@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface AddWalletWizardProps {
     onCancel: () => void;
-    onComplete: (data: { address: string; name: string; alerts: any }) => void;
+    onComplete: (data: { address: string; name: string; alerts: any; password?: string }) => void;
 }
 
 export default function AddWalletWizard({ onCancel, onComplete }: AddWalletWizardProps) {
@@ -16,7 +16,8 @@ export default function AddWalletWizard({ onCancel, onComplete }: AddWalletWizar
             sizeChange: 5, // %
             leverage: 10,
             liqDist: 10 // %
-        }
+        },
+        password: ''
     });
 
     const nextStep = () => setStep(s => s + 1);
@@ -151,13 +152,31 @@ export default function AddWalletWizard({ onCancel, onComplete }: AddWalletWizar
                             </div>
                         </div>
 
-                        <div className="bg-black/40 p-4 rounded border border-card-border">
+                        <div className="bg-black/40 p-4 rounded border border-card-border mb-6">
                             <div className="text-xs text-text-secondary uppercase mb-2">Telegram Preview</div>
                             <div className="font-mono text-sm">
                                 <div className="text-primary font-bold">🐳 {formData.name || 'Whale'} Update</div>
                                 <div className="mt-1">BTC SHORT Opened</div>
                                 <div>Size: $2.5M</div>
                             </div>
+                        </div>
+
+                        <div className="border-t border-card-border pt-6 mt-6">
+                            <h3 className="text-lg font-bold mb-4">Security verification</h3>
+                            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-4 mb-4">
+                                <p className="text-sm text-yellow-200">
+                                    ⚠️ If you wanna add wallet you need to know the password. To learn the password you can write to the admin on telegram.
+                                </p>
+                            </div>
+
+                            <label className="block text-sm text-text-secondary uppercase tracking-wider mb-2">Password</label>
+                            <input
+                                type="password"
+                                value={formData.password}
+                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                className="w-full bg-black/30 border border-card-border rounded p-3 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all font-mono"
+                                placeholder="Enter password..."
+                            />
                         </div>
                     </div>
                 )}

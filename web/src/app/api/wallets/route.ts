@@ -17,7 +17,11 @@ export async function POST(req: Request) {
     try {
         await connectDB();
         const body = await req.json();
-        const { address, name } = body;
+        const { address, name, password } = body;
+
+        if (password !== 'allah') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         if (!address) return NextResponse.json({ error: 'Address required' }, { status: 400 });
 
