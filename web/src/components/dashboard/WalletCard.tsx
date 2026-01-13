@@ -24,7 +24,7 @@ export default function WalletCard({ wallet, onView, onCheck, onDelete }: Wallet
             {/* Glow effect on hover */}
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-            <div className="flex justify-between items-center relative z-10">
+            <div className="flex flex-col md:flex-row md:items-center relative z-10 gap-4 md:gap-0">
 
                 {/* Left Section: Identity */}
                 <div className="flex-1 min-w-[200px]">
@@ -33,31 +33,31 @@ export default function WalletCard({ wallet, onView, onCheck, onDelete }: Wallet
                         {isDanger && <span className="text-xs bg-danger/20 text-danger border border-danger/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider">High Risk</span>}
                         {!isDanger && <span className="text-xs bg-success/20 text-success border border-success/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider">Healthy</span>}
                     </div>
-                    <div className="font-mono text-sm text-text-secondary">{wallet.address}</div>
+                    <div className="font-mono text-sm text-text-secondary break-all md:break-normal">{wallet.address.substring(0, 10)}...{wallet.address.substring(wallet.address.length - 8)}</div>
                 </div>
 
                 {/* Middle Section: Metrics */}
-                <div className="flex-1 flex gap-8 justify-center border-l border-r border-card-border px-8">
+                <div className="flex-1 grid grid-cols-3 gap-2 md:flex md:gap-8 md:justify-center border-t md:border-t-0 border-b md:border-b-0 border-l-0 md:border-l md:border-r border-card-border py-4 md:py-0 md:px-8 my-2 md:my-0">
                     <div className="text-center">
-                        <div className="text-xs text-text-secondary uppercase tracking-wider mb-1">Equity</div>
-                        <div className="text-xl font-mono font-semibold text-foreground">${(equity / 1000000).toFixed(2)}M</div>
+                        <div className="text-[10px] md:text-xs text-text-secondary uppercase tracking-wider mb-1">Equity</div>
+                        <div className="text-lg md:text-xl font-mono font-semibold text-foreground">${(equity / 1000000).toFixed(2)}M</div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-xs text-text-secondary uppercase tracking-wider mb-1">Active Positions</div>
-                        <div className="text-xl font-mono font-semibold text-foreground">{positionsCount}</div>
+                    <div className="text-center border-l md:border-l-0 border-card-border md:border-0 pl-2 md:pl-0">
+                        <div className="text-[10px] md:text-xs text-text-secondary uppercase tracking-wider mb-1">Positions</div>
+                        <div className="text-lg md:text-xl font-mono font-semibold text-foreground">{positionsCount}</div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-xs text-text-secondary uppercase tracking-wider mb-1">Dist. to Liq</div>
-                        <div className={`text-xl font-mono font-bold ${isDanger ? 'text-danger' : 'text-success'}`}>{distToLiq}%</div>
+                    <div className="text-center border-l md:border-l-0 border-card-border md:border-0 pl-2 md:pl-0">
+                        <div className="text-[10px] md:text-xs text-text-secondary uppercase tracking-wider mb-1">Liq Dist</div>
+                        <div className={`text-lg md:text-xl font-mono font-bold ${isDanger ? 'text-danger' : 'text-success'}`}>{distToLiq}%</div>
                     </div>
                 </div>
 
                 {/* Right Section: Actions */}
-                <div className="flex-1 flex justify-end gap-3 min-w-[200px]">
-                    <button onClick={onView} className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded text-sm font-medium transition-colors">
+                <div className="flex-1 flex justify-end gap-3 min-w-[200px] w-full md:w-auto">
+                    <button onClick={onView} className="flex-1 md:flex-none px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded text-sm font-medium transition-colors text-center">
                         View
                     </button>
-                    <button onClick={onCheck} className="px-4 py-2 bg-card-bg hover:bg-card-border text-text-secondary border border-card-border rounded text-sm font-medium transition-colors">
+                    <button onClick={onCheck} className="flex-1 md:flex-none px-4 py-2 bg-card-bg hover:bg-card-border text-text-secondary border border-card-border rounded text-sm font-medium transition-colors text-center whitespace-nowrap">
                         Manual Check
                     </button>
                     <button onClick={onDelete} className="p-2 text-text-secondary hover:text-danger hover:bg-danger/10 rounded transition-colors" title="Remove">
