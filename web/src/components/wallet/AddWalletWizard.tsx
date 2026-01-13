@@ -165,7 +165,7 @@ export default function AddWalletWizard({ onCancel, onComplete }: AddWalletWizar
                             <h3 className="text-lg font-bold mb-4">Security verification</h3>
                             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-4 mb-4">
                                 <p className="text-sm text-yellow-200">
-                                    ⚠️ If you wanna add wallet you need to know the password. To learn the password you can write to the admin on telegram.
+                                    ⚠️ If you wanna add wallet you need to know the password. To learn the password you can write to @rainingmann on telegram.
                                 </p>
                             </div>
 

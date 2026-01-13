@@ -13,13 +13,15 @@ export async function GET() {
     }
 }
 
+const ADMIN_PASSWORD = 'allah';
+
 export async function POST(req: Request) {
     try {
         await connectDB();
         const body = await req.json();
         const { address, name, password } = body;
 
-        if (password !== 'allah') {
+        if (password !== ADMIN_PASSWORD) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -48,7 +50,13 @@ export async function DELETE(req: Request) {
         await connectDB();
         const { searchParams } = new URL(req.url);
         const address = searchParams.get('address');
+        const password = req.headers.get('x-admin-password');
+
         if (!address) return NextResponse.json({ error: 'Address required' }, { status: 400 });
+
+        if (password !== ADMIN_PASSWORD) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         const existing = await WalletModel.findOneAndDelete({ address });
 

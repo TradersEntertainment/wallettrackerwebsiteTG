@@ -62,10 +62,29 @@ export default function Home() {
   };
 
   const handleDeleteWallet = async (address: string) => {
-    if (!confirm('Are you sure?')) return;
+    if (!confirm('Are you sure you want to delete this wallet?')) return;
+
+    const password = prompt('Enter admin password to delete:');
+    if (!password) return;
+
     try {
-      await fetch(`/api/wallets?address=${address}`, { method: 'DELETE' });
-      fetchWallets();
+      const res = await fetch(`/api/wallets?address=${address}`, {
+        method: 'DELETE',
+        headers: {
+          'x-admin-password': password
+        }
+      });
+
+      if (res.status === 401) {
+        alert('Incorrect password! Please contact @rainingmann on Telegram.');
+        return;
+      }
+
+      if (res.ok) {
+        fetchWallets();
+      } else {
+        alert('Failed to delete wallet');
+      }
     } catch (e) { console.error(e); }
   };
 
