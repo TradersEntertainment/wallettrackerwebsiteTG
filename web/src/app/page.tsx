@@ -88,6 +88,33 @@ export default function Home() {
     } catch (e) { console.error(e); }
   };
 
+  const handleManualCheck = async (address: string) => {
+    const password = prompt('Enter admin password to manual check:');
+    if (!password) return;
+
+    try {
+      const res = await fetch('/api/wallets', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({ address, forceUpdate: true })
+      });
+
+      if (res.status === 401) {
+        alert('Incorrect password! Please contact @rainingmann on Telegram.');
+        return;
+      }
+
+      if (!res.ok) {
+        alert('Failed to trigger manual check');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
@@ -99,7 +126,7 @@ export default function Home() {
                 wallets={wallets}
                 loading={loading}
                 onView={(addr) => setDetailedWallet(addr)}
-                onCheck={(addr) => fetch('/api/wallets', { method: 'PATCH', body: JSON.stringify({ address: addr, forceUpdate: true }) })}
+                onCheck={handleManualCheck}
                 onDelete={handleDeleteWallet}
                 onAddClick={() => setCurrentView('add-wallet')}
               />

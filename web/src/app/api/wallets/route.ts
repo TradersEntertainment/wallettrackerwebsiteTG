@@ -77,8 +77,13 @@ export async function PATCH(req: Request) {
         await connectDB();
         const body = await req.json();
         const { address, forceUpdate } = body;
+        const password = req.headers.get('x-admin-password');
 
         if (!address) return NextResponse.json({ error: 'Address required' }, { status: 400 });
+
+        if (password !== ADMIN_PASSWORD) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         await WalletModel.findOneAndUpdate({ address }, { forceUpdate });
 
